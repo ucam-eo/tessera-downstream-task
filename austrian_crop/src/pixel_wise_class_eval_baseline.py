@@ -20,7 +20,7 @@ warnings.filterwarnings("ignore")
 parser = argparse.ArgumentParser(description='Land Classification with Multiple Experiments')
 parser.add_argument('--sample_per_pixel', type=int, default=10, help='Number of samples per class (default: 10)')
 parser.add_argument('--num_experiment', type=int, default=200, help='Number of experiments to run (default: 200)')
-parser.add_argument('--result_dir', type=str, default='austrian_crop/logs', help='Directory to save results')
+parser.add_argument('--result_dir', type=str, default='logs', help='Directory to save results')
 parser.add_argument('--model', type=str, default='RandomForest', choices=['LogisticRegression', 'RandomForest'], 
                     help='Model to use for classification (default: RandomForest)')
 parser.add_argument('--val_test_split_ratio', type=float, default=0, 
@@ -29,16 +29,16 @@ parser.add_argument('--generate_plots', action='store_true', help='Generate plot
 parser.add_argument('--njobs', type=int, default=12, help='Number of parallel jobs')
 parser.add_argument('--chunk_size', type=int, default=1000, help='Chunk size for processing')
 parser.add_argument('--bands_file_path', type=str, 
-                   default="austrian_crop/data/bands_downsample_100.npy",
+                   default="data/bands_downsample_100.npy",
                    help='Path to S2 bands file')
 parser.add_argument('--label_file_path', type=str,
-                   default="austrian_crop/data/fieldtype_17classes_downsample_100.npy",
+                   default="data/fieldtype_17classes_downsample_100.npy",
                    help='Path to labels file')
 parser.add_argument('--sar_asc_bands_file_path', type=str,
-                   default="austrian_crop/data/sar_ascending_downsample_100.npy",
+                   default="data/sar_ascending_downsample_100.npy",
                    help='Path to SAR ascending bands file')
 parser.add_argument('--sar_desc_bands_file_path', type=str,
-                   default="austrian_crop/data/sar_descending_downsample_100.npy",
+                   default="data/sar_descending_downsample_100.npy",
                    help='Path to SAR descending bands file')
 args = parser.parse_args()
 

@@ -61,3 +61,7 @@ austrian_crop/src/utils/visualize_hexbin_map.py
 austrian_crop/src/utils/visualize_s1_and_s2.py
 austrian_crop/src/utils/visualize_tiff_whole_year.py
 austrian_crop/src/utils/visualize_uk_representation.py
+tree_species_prediction/
+canopy_height/data/training_data_efm_embedding
+canopy_height/data/training_data_presto_embedding
+canopy_height/data/training_data_tessera_embedding

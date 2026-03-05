@@ -22,15 +22,15 @@ TORCH_SEED = 42
 # Embedding file paths
 
 # TESSERA
-REPRESENTATION_FILE_PATH = "austrian_crop/data/austrian_crop_tessera_embedding_downsample_100.npy"
+REPRESENTATION_FILE_PATH = "data/austrian_crop_tessera_embedding_downsample_100.npy"
 # Google Satellite Embedding
-# REPRESENTATION_FILE_PATH = "austrian_crop/data/austrian_crop_gse_embedding_downsample_100.npy"
+# REPRESENTATION_FILE_PATH = "data/austrian_crop_gse_embedding_downsample_100.npy"
 # PRESTO
-# REPRESENTATION_FILE_PATH = "austrian_crop/data/austrian_crop_presto_embeddings_downsample_100.npy"
+# REPRESENTATION_FILE_PATH = "data/austrian_crop_presto_embeddings_downsample_100.npy"
 
-LABEL_FILE_PATH = "austrian_crop/data/fieldtype_17classes_downsample_100.npy"
-FIELD_ID_FILE_PATH = "austrian_crop/data/fieldid_downsample_100.npy"
-UPDATED_FIELDDATA_PATH = "austrian_crop/data/updated_fielddata.csv"
+LABEL_FILE_PATH = "data/fieldtype_17classes_downsample_100.npy"
+FIELD_ID_FILE_PATH = "data/fieldid_downsample_100.npy"
+UPDATED_FIELDDATA_PATH = "data/updated_fielddata.csv"
 
 # Dataset split ratios
 TRAINING_RATIO = 0.25  # Proportion of all samples for training set

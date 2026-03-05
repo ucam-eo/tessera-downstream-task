@@ -24,12 +24,12 @@ NUMPY_SEED = 42
 TORCH_SEED = 42
 
 # Data file paths
-BANDS_FILE_PATH = "austrian_crop/data/bands_downsample_100.npy"
-LABEL_FILE_PATH = "austrian_crop/data/fieldtype_17classes_downsample_100.npy"
-FIELD_ID_FILE_PATH = "austrian_crop/data/fieldid_downsample_100.npy"
-UPDATED_FIELDDATA_PATH = 'austrian_crop/data/updated_fielddata.csv'
-SAR_ASC_BANDS_FILE_PATH = "austrian_crop/data/sar_ascending_downsample_100.npy"
-SAR_DESC_BANDS_FILE_PATH = "austrian_crop/data/sar_descending_downsample_100.npy"
+BANDS_FILE_PATH = "data/bands_downsample_100.npy"
+LABEL_FILE_PATH = "data/fieldtype_17classes_downsample_100.npy"
+FIELD_ID_FILE_PATH = "data/fieldid_downsample_100.npy"
+UPDATED_FIELDDATA_PATH = 'data/updated_fielddata.csv'
+SAR_ASC_BANDS_FILE_PATH = "data/sar_ascending_downsample_100.npy"
+SAR_DESC_BANDS_FILE_PATH = "data/sar_descending_downsample_100.npy"
 
 # Log settings
 LOG_FILE = "feature_analysis.log"
