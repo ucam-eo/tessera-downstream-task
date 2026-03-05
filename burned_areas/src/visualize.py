@@ -93,7 +93,7 @@ def plot_umap_selected_labels(
         hue="label",
         palette=color_map,
         s=point_size,
-        alpha=alpha,
+        alpha=0.7,  # Set transparency to 0.7
         legend=False,
     )
 
@@ -130,13 +130,13 @@ def plot_umap_selected_labels(
             )
 
     # Styling
-    ax.set_xlabel("UMAP 1")
-    ax.set_ylabel("UMAP 2")
+    ax.set_xlabel("UMAP 1", fontsize=18)
+    ax.set_ylabel("UMAP 2", fontsize=18)
     ax.spines[["top", "right"]].set_visible(False)
     plt.rcParams.update(
         {
             "font.family": "sans-serif",
-            "font.size": 14,
+            "font.size": 18,
             "axes.linewidth": 0.8,
             "axes.edgecolor": "black",
             "xtick.major.size": 4,
@@ -199,12 +199,25 @@ def plot_label_efficiency_comparison(ratios, combined_scores_dict, sample_counts
         else:
             return f"{n/1000000:.1f}M"
 
+    # --- Helper function for formatting ratios ---
+    def format_ratio(r):
+        """Format ratio percentages to remove unnecessary trailing zeros."""
+        percentage = r * 100
+        if percentage == int(percentage):
+            return f"{int(percentage)}%"
+        elif percentage == round(percentage, 1):
+            return f"{percentage:.1f}%"
+        elif percentage == round(percentage, 2):
+            return f"{percentage:.2f}%"
+        else:
+            return f"{percentage:.3f}%"
+
     # --- Plot Styling ---
     plt.rcParams.update({"font.size": 14, "font.family": "sans-serif"})
     fig, ax = plt.subplots(figsize=(10, 8))
 
     # Define a color cycle for the lines
-    colors = ["#004488", "#D85D1A", "#1E8449"]  # A nice blue, orange, green
+    colors = ["#6A2C70", "#F08A5D", "#2D6A4F"]  # Purple for TESSERA, Orange for Composite, Green for GSE
     color_cycle = iter(colors)
 
     # --- Plotting the Data ---
@@ -234,7 +247,7 @@ def plot_label_efficiency_comparison(ratios, combined_scores_dict, sample_counts
     ax.tick_params(axis="y", which="major", labelsize=14, width=1.5)
     ax.set_xscale("log")
     ax.set_xticks(ratios)
-    ax.set_xticklabels([f"{r*100:.3f}%" for r in ratios], rotation=45, ha="right")
+    ax.set_xticklabels([format_ratio(r) for r in ratios], rotation=45, ha="right")
 
     # Ensure y-axis starts at 0
     ax.set_ylim(0.3, 1.00)
@@ -257,6 +270,103 @@ def plot_label_efficiency_comparison(ratios, combined_scores_dict, sample_counts
 
     # --- Legend ---
     ax.legend(loc="lower right", fontsize=14, frameon=False)
+
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_label_efficiency_comparison_zoomin(ratios, combined_scores_dict, sample_counts):
+    """
+    Creates a zoomed-in version of the label efficiency comparison plot focusing on
+    TESSERA and Task-Specific Composite performance from 1% to 100% training data.
+
+    Parameters
+    ----------
+    ratios : list of float
+        List of ratios (0.0 to 1.0) representing the fraction of training data used.
+    combined_scores_dict : dict
+        Dictionary where keys are approach/model names and values are F1-scores.
+    sample_counts : list of int
+        List of absolute sample counts (not used in this zoomed version).
+    """
+    # Filter data for 1% to 100% range (ratios >= 0.01)
+    zoom_indices = [i for i, r in enumerate(ratios) if r >= 0.01]
+    zoom_ratios = [ratios[i] for i in zoom_indices]
+
+    # Extract only TESSERA and Task-Specific Composite data
+    target_approaches = ["TESSERA", "Task-Specific Composite"]
+    zoom_scores = {}
+
+    for approach_name, scores in combined_scores_dict.items():
+        if approach_name in target_approaches:
+            zoom_scores[approach_name] = [scores[i] for i in zoom_indices]
+
+    # Calculate y-axis range based on the data
+    all_values = []
+    for scores in zoom_scores.values():
+        all_values.extend(scores)
+    y_min = min(all_values) - 0.01
+    y_max = max(all_values) + 0.01
+
+    # --- Helper function for formatting ratios ---
+    def format_ratio(r):
+        """Format ratio percentages to remove unnecessary trailing zeros."""
+        percentage = r * 100
+        if percentage == int(percentage):
+            return f"{int(percentage)}%"
+        elif percentage == round(percentage, 1):
+            return f"{percentage:.1f}%"
+        elif percentage == round(percentage, 2):
+            return f"{percentage:.2f}%"
+        else:
+            return f"{percentage:.3f}%"
+
+    # --- Plot Styling ---
+    plt.rcParams.update({"font.size": 14, "font.family": "sans-serif"})
+    fig, ax = plt.subplots(figsize=(16, 4))  # 4:1 width to height ratio
+
+    # Define colors for TESSERA and Task-Specific Composite
+    approach_colors = {
+        "TESSERA": "#6A2C70",
+        "Task-Specific Composite": "#F08A5D"
+    }
+
+    # --- Plotting the Data ---
+    for approach_name, scores in zoom_scores.items():
+        ax.plot(
+            zoom_ratios,
+            scores,
+            marker="o",
+            linestyle="-",
+            label=approach_name,
+            markersize=16,  # Doubled from 8 to 16
+            zorder=10,
+            color=approach_colors[approach_name],
+            linewidth=2.5,
+        )
+
+    # --- Aesthetics ---
+    # Show all four spines (frame around the plot)
+    for spine in ax.spines.values():
+        spine.set_visible(True)
+        spine.set_linewidth(1.5)
+
+    # --- X-axis configuration ---
+    ax.tick_params(axis="x", which="major", labelsize=28, pad=7, width=1.5)  # Doubled font size
+    ax.tick_params(axis="y", which="major", labelsize=28, width=1.5)  # Doubled font size
+    ax.set_xscale("log")
+    ax.set_xticks(zoom_ratios)
+    ax.set_xticklabels([format_ratio(r) for r in zoom_ratios], rotation=45, ha="right")
+
+    # Remove axis labels (only keep ticks and tick labels)
+    ax.set_xlabel("")
+    ax.set_ylabel("")
+
+    # Set fixed y-axis range and custom y-ticks
+    ax.set_ylim(0.950, 0.965)
+    ax.set_yticks([0.9500, 0.9575, 0.9650])
+
+    # No legend for zoomin version
 
     plt.tight_layout()
     plt.show()
@@ -298,8 +408,8 @@ def plot_comparison_maps(gt_A, pred_A, gt_B, pred_B):
     # --- Correct Color Mapping ---
     # Unburned (0) -> Blue, Burned (1) -> Red, NoData/Other (-1) -> Gray
     cmap_dict = {
-        0: "#1f77b4",  # Unburned -> Blue
-        1: "#d62728",  # Burned -> Red
+        0: "#1E93AB",  # Unburned -> Blue
+        1: "#E62727",  # Burned -> Red
         -1: "#cccccc",  # NoData/Other -> Gray
     }
     codes = sorted(cmap_dict.keys())
@@ -328,18 +438,121 @@ def plot_comparison_maps(gt_A, pred_A, gt_B, pred_B):
     axes[3].set_title("Area B: Prediction", fontsize=18)
     axes[3].axis("off")
 
-    legend_patches = [
-        mpatches.Patch(color=cmap_dict[0], label="Unburned"),
-        mpatches.Patch(color=cmap_dict[1], label="Burned"),
-        mpatches.Patch(color=cmap_dict[-1], label="NoData / Other"),
-    ]
-    fig.legend(
-        handles=legend_patches,
-        loc="lower center",
-        ncol=len(legend_patches),
-        bbox_to_anchor=(0.5, 0.02),
-        fontsize=16,
-    )
-
+    # Remove legend
     plt.subplots_adjust(wspace=0.02, hspace=0.02, top=0.95, bottom=0.1)
+    plt.show()
+
+
+def plot_fp_fn_analysis(gt_A, pred_A, gt_B, pred_B):
+    """
+    Creates a 2x3 comparison plot showing Ground Truth, Prediction, and FP/FN analysis for two areas.
+
+    This function creates a detailed analysis comparing ground truth vs predictions with
+    false positive/false negative breakdown for two areas in a 2x3 layout.
+
+    Parameters
+    ----------
+    gt_A : np.ndarray
+        2D array containing ground truth labels for Area A
+    pred_A : np.ndarray
+        2D array containing prediction labels for Area A
+    gt_B : np.ndarray
+        2D array containing ground truth labels for Area B
+    pred_B : np.ndarray
+        2D array containing prediction labels for Area B
+
+    Returns
+    -------
+    None
+        Displays the plot using matplotlib.
+    """
+    print("Generating 2x3 FP/FN analysis comparison...")
+
+    fig, axes = plt.subplots(2, 3, figsize=(21, 14))
+
+    # Define color maps for GT/Pred (burned/unburned)
+    gt_pred_cmap_dict = {
+        0: "#1E93AB",  # Unburned
+        1: "#E62727",  # Burned
+        -1: "#cccccc", # NoData/Other
+    }
+
+    # Define color map for FP/FN analysis
+    # TP = True Positive, TN = True Negative, FP = False Positive, FN = False Negative
+    fp_fn_cmap_dict = {
+        0: "#2D4059",  # True Negative (correctly predicted unburned)
+        1: "#EA5455",  # False Positive (wrongly predicted burned)
+        2: "#F07B3F",  # False Negative (wrongly predicted unburned)
+        3: "#FFD460",  # True Positive (correctly predicted burned)
+        -1: "#cccccc", # NoData/Other
+    }
+
+    def create_colormap_and_norm(cmap_dict):
+        codes = sorted(cmap_dict.keys())
+        colors = [cmap_dict[c] for c in codes]
+        cmap = ListedColormap(colors)
+        boundaries = [c - 0.5 for c in codes] + [codes[-1] + 0.5]
+        norm = BoundaryNorm(boundaries, cmap.N)
+        return cmap, norm
+
+    def calculate_fp_fn_map(gt, pred):
+        """Calculate FP/FN analysis map"""
+        result = np.full_like(gt, -1)  # Initialize with NoData
+
+        # Create masks for valid data (not -1)
+        valid_mask = (gt != -1) & (pred != -1)
+
+        # True Negative: GT=0, Pred=0 (correctly predicted unburned)
+        tn_mask = valid_mask & (gt == 0) & (pred == 0)
+        result[tn_mask] = 0
+
+        # False Positive: GT=0, Pred=1 (wrongly predicted burned)
+        fp_mask = valid_mask & (gt == 0) & (pred == 1)
+        result[fp_mask] = 1
+
+        # False Negative: GT=1, Pred=0 (wrongly predicted unburned)
+        fn_mask = valid_mask & (gt == 1) & (pred == 0)
+        result[fn_mask] = 2
+
+        # True Positive: GT=1, Pred=1 (correctly predicted burned)
+        tp_mask = valid_mask & (gt == 1) & (pred == 1)
+        result[tp_mask] = 3
+
+        return result
+
+    # Create colormaps
+    gt_pred_cmap, gt_pred_norm = create_colormap_and_norm(gt_pred_cmap_dict)
+    fp_fn_cmap, fp_fn_norm = create_colormap_and_norm(fp_fn_cmap_dict)
+
+    # Calculate FP/FN maps
+    fp_fn_A = calculate_fp_fn_map(gt_A, pred_A)
+    fp_fn_B = calculate_fp_fn_map(gt_B, pred_B)
+
+    # Row 1: Area A
+    axes[0, 0].imshow(gt_A, cmap=gt_pred_cmap, norm=gt_pred_norm)
+    axes[0, 0].set_title("Area A: Ground Truth", fontsize=18)
+    axes[0, 0].axis("off")
+
+    axes[0, 1].imshow(pred_A, cmap=gt_pred_cmap, norm=gt_pred_norm)
+    axes[0, 1].set_title("Area A: Prediction", fontsize=18)
+    axes[0, 1].axis("off")
+
+    axes[0, 2].imshow(fp_fn_A, cmap=fp_fn_cmap, norm=fp_fn_norm)
+    axes[0, 2].set_title("Area A: FP/FN Analysis", fontsize=18)
+    axes[0, 2].axis("off")
+
+    # Row 2: Area B
+    axes[1, 0].imshow(gt_B, cmap=gt_pred_cmap, norm=gt_pred_norm)
+    axes[1, 0].set_title("Area B: Ground Truth", fontsize=18)
+    axes[1, 0].axis("off")
+
+    axes[1, 1].imshow(pred_B, cmap=gt_pred_cmap, norm=gt_pred_norm)
+    axes[1, 1].set_title("Area B: Prediction", fontsize=18)
+    axes[1, 1].axis("off")
+
+    axes[1, 2].imshow(fp_fn_B, cmap=fp_fn_cmap, norm=fp_fn_norm)
+    axes[1, 2].set_title("Area B: FP/FN Analysis", fontsize=18)
+    axes[1, 2].axis("off")
+
+    plt.subplots_adjust(wspace=0.02, hspace=0.1, top=0.95, bottom=0.05)
     plt.show()
