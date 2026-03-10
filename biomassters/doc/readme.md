@@ -31,4 +31,8 @@ The AlphaEarth representations can be obtained by running ***alphaearth_preproce
 
 The regressor expects the files to be under **root_dir/efm/data/** in subfolders **train_representations_all** and **test_representations** in **.npy** format. 
 
-After this, the UNet model can be trained by running ***unet_regressor.py*** with the option **efm=True**. 
+After this, the UNet model can be trained by running ***unet_regressor.py*** with the option **efm=True**.
+
+## Plotting
+
+The code for plotting the figures in the TESSERA paper can be found in ***plotting.ipynb*** and the precalculated data for the figures under **data/** directory.
